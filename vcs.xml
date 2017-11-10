@@ -6,8 +6,12 @@
           <option name="url" value="https://github.com/yeeeeerin/OinkOink.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/poq65/Oink_final.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
-    <option name="cloneParentDir" value="C:\Users\jihyun\Desktop" />
+    <option name="cloneParentDir" value="C:\Users\jihyun\Documents\Oink_final" />
   </component>
 </application>
