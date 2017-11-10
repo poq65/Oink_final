@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -243,6 +244,23 @@ if(v.getId()==R.id.setButton) {
     }
 
 
+    //backey 설정
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+
+        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+
+            // 전화면
+            Intent intent = new Intent(getApplicationContext(),//현재화면의
+                    CalenderDialog.class);//다음 넘어갈 클래스 지정
+
+            startActivity(intent);//다음 화면으로 넘어간다
+            finish();
+        }
+        return true;
+
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
