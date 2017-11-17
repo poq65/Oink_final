@@ -25,6 +25,7 @@ public class FirstFragment extends Fragment {
         GridView calender = (GridView)view.findViewById(R.id.grid_date);
         //MonthAdapter monthAdapter=new MonthAdapter(getActivity());
 
+        calender.setAdapter(CalenderDialog.monthAdapter);
         CalenderDialog.monthAdapter.setPriviousMonth();
         CalenderDialog.monthAdapter.notifyDataSetChanged();
 
@@ -37,7 +38,7 @@ public class FirstFragment extends Fragment {
         year.setText(Integer.toString(CalenderDialog.monthAdapter.getCurrentYear()));
         month.setText(Integer.toString(CalenderDialog.monthAdapter.getCurrentMonth()));
 
-        calender.setAdapter(CalenderDialog.monthAdapter);
+        //calender.setAdapter(CalenderDialog.monthAdapter);
 
         Log.d("frag_txt",year.getText().toString()
                 +"   ,   "+month.getText().toString());
