@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -48,6 +49,11 @@ import io.realm.RealmResults;
 public class MainActivity extends AppCompatActivity {
 
     final static String LOG_TAG = "myLogs";
+
+    //그 전 화면의 intent에서 date정보를 가져오는 함수
+    static String intent_setDate;
+
+
 
     /* 뷰 */
     private TextView mTxtPercent; // 달성률 __ click 금액 다이얼로그
@@ -88,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
     String remainMoney; // 남은돈
     String SetDate; // 선택 날짜 설정
+    String currnet_Date;//원래 오늘 날짜
+
+    int setmoney;
 
     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-M-d", Locale.KOREA);
 
@@ -95,6 +104,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        //그 전 화면의 intent에서 date정보를 가져오는 구문
+
 
         /* 스플래쉬 화면*/
         startActivity(new Intent(MainActivity.this, Splash.class));
@@ -107,6 +120,15 @@ public class MainActivity extends AppCompatActivity {
 
         Date dd=new Date();
         SetDate=transFormat.format(dd);
+
+        if(intent_setDate != null){
+            SetDate=intent_setDate;
+            Log.d("day", SetDate);
+        }
+
+        currnet_Date = transFormat.format(dd); //현재날짜
+
+
         mIncExpList = (ListView) findViewById(R.id.list_use);
         myRealm = Realm.getInstance(MainActivity.this);
         instance = this;
@@ -127,45 +149,9 @@ public class MainActivity extends AppCompatActivity {
         mIncExpList.setAdapter(dataAdapter);
 
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
-        int setmoney = 0;
-        /* db의 데이터  가져오기 */
-        try {
-            Date d = new SimpleDateFormat("yyyy-M-d").parse(SetDate);
+        setmoney = 0;
+        getDailyMoney();
 
-            RealmResults<DailyMoneyModel> results = myRealm.where(DailyMoneyModel.class)
-                    .lessThanOrEqualTo("startDate", d)
-                    .greaterThanOrEqualTo("endDate", d)
-                    .findAll();
-            //        Log.e("ee", results.get(results.size()-1).getEndDate());
-            myRealm.beginTransaction();
-
-            if (results.size() > 0) {
-                setmoney=results.get(0).getMoney_set();
-                String string = Integer.toString(setmoney - money_sum);
-                Log.e("money", "일일설정액 - 선택한 날짜 " + string);
-                 /* 일일 설정액 초과시 알림*/
-                if(Integer.valueOf(string)<0) {
-                    NotificationSomethings();
-                }
-
-                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
-                mTxtPercent.setText(remainMoney+"%");
-            }
-            myRealm.commitTransaction();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-
-
-//        // 달성률 클릭시
-//        mTxtPercent.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 일일설정액 - 사용금액 = 남은금엑
-//
-//            }
-//        });
 
         //버튼 클릭 시 회전
         frontView.setOnClickListener(new View.OnClickListener() {
@@ -232,6 +218,44 @@ public class MainActivity extends AppCompatActivity {
     } // end onCreate
 
 
+    //일일설정약 db에서 데이터 가져오기 , 빼기
+    private void getDailyMoney(){
+
+        try {
+            Date d = new SimpleDateFormat("yyyy-M-d").parse( SetDate);
+            Log.e("ee", d.toString()+"날짜 date변");
+
+            RealmResults<DailyMoneyModel> results = myRealm.where(DailyMoneyModel.class)
+                    .lessThanOrEqualTo("startDate",d)
+                    .greaterThanOrEqualTo("endDate",d)
+                    .findAll();
+//        Log.e("ee", results.get(results.size()-1).getEndDate());
+            myRealm.beginTransaction();
+
+
+
+            if (results.size()>0) {
+                setmoney=results.get(0).getMoney_set();
+                String string = Integer.toString(setmoney - money_sum);
+                Log.e("money", "일일설정액 - 선택한 날짜 " + string);
+                // /* 일일 설정액 초과시 알림
+                if(Integer.valueOf(string)<0) {
+                    NotificationSomethings();
+                }
+
+                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
+                mTxtPercent.setText(remainMoney+"%");
+            }
+
+            myRealm.commitTransaction();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 ///--------------------db관련 함수들-----------------------
 
     public static MainActivity getInstance() {
@@ -249,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
     private void getAllUsers() {
         Log.e(LOG_TAG, "DataList.getAllUsers");
         dataDetailsModelArrayList.clear();
-        RealmResults<DataDetailsModel> results = myRealm.where(DataDetailsModel.class).equalTo("date", SetDate).findAll();
+        RealmResults<DataDetailsModel> results = myRealm.where(DataDetailsModel.class).equalTo("date",  SetDate).findAll();
         myRealm.beginTransaction();
         for (int i = 0; i < results.size(); i++) {
             dataDetailsModelArrayList.add(results.get(i));
@@ -315,25 +339,6 @@ public class MainActivity extends AppCompatActivity {
 
     } // end addDataToRealm
 
-/*
-    private void addDataToRealm2(DataDetailsModel model) {
-        Log.e(LOG_TAG, "DataList.addDataToRealm2");
-
-        myRealm.beginTransaction();
-
-        DataDetailsModel dataDetailsModel2 = myRealm.createObject(DataDetailsModel.class);
-        dataDetailsModel2.setId(id + dataDetailsModelArrayList.size()); //id+남아있는리스트개수를 해줘야해
-        dataDetailsModel2.setName(model.getName());
-        dataDetailsModel2.setPrice(model.getPrice());
-        dataDetailsModel2.setDate(model.getDate());
-        dataDetailsModel2.setInOrOut(true); //수입
-        dataDetailsModelArrayList.add(dataDetailsModel2);
-        myRealm.commitTransaction();
-        dataDetailsAdapter.notifyDataSetChanged();
-        id++;
-    }// end addDataToRealm2
-
- */
 
 
     /* 데이터 업데이트 함수 (수정) */
@@ -377,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText etAddCategory = (EditText) promptsView.findViewById(R.id.setCategory);
         final EditText etAddIncome = (EditText) promptsView.findViewById(R.id.setIncome);
         TextView tv_datee = (TextView) promptsView.findViewById(R.id.tv_datee);
-        tv_datee.setText(SetDate);
+        tv_datee.setText(currnet_Date);
 
         final RadioGroup rg = (RadioGroup) promptsView.findViewById(R.id.dialog_rg);
         int checkedId = rg.getCheckedRadioButtonId();
@@ -432,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
                         DataDetailsModel dataDetailsModel = new DataDetailsModel();
                         dataDetailsModel.setName(etAddCategory.getText().toString());
                         dataDetailsModel.setPrice(Integer.parseInt(etAddIncome.getText().toString()));
-                        dataDetailsModel.setDate(transFormat.format(new Date())); //date추가
+                        dataDetailsModel.setDate(currnet_Date); //date추가
                         dataDetailsModel.setInOrOut(false);
 
                         Log.d("ee", dataDetailsModel.getDate().toString());
@@ -447,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                         DataDetailsModel dataDetailsModel = new DataDetailsModel();
                         dataDetailsModel.setName(etAddCategory.getText().toString());
                         dataDetailsModel.setPrice(Integer.parseInt(etAddIncome.getText().toString()));
-                        dataDetailsModel.setDate(transFormat.format(new Date())); //date추가
+                        dataDetailsModel.setDate(currnet_Date); //date추가
                         dataDetailsModel.setInOrOut(true); //지출
 
 
@@ -468,69 +473,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }// end addOrUpdate
-
-
-    /*
-    ////////////////////////////////////////////////////////////////이게 뭐야???????????????
-    public void addOrUpdatePersonDetailsDialog22(final DataDetailsModel model,final int position) {
-
-        //* subdialog
-        Log.e(LOG_TAG, "DataList.addOrUpdatePersonDetailsDialog");
-        subDialog = new AlertDialog.Builder(MainActivity.this)
-                .setMessage("모두 입력해주세요")
-                .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dlg2, int which) {
-                        dlg2.cancel();
-                    }
-                });
-
-       //* maindialog
-        LayoutInflater li = LayoutInflater.from(MainActivity.this);
-        View promptsView = li.inflate(R.layout.income_dialog, null);
-        AlertDialog.Builder mainDialog = new AlertDialog.Builder(MainActivity.this);
-        mainDialog.setView(promptsView);
-        final EditText etAddPersonName = (EditText) promptsView.findViewById(R.id.setCategory);
-        final EditText etAddPersonAge = (EditText) promptsView.findViewById(R.id.setIncome);
-        if (model != null) {
-            etAddPersonName.setText(model.getName());
-            etAddPersonAge.setText(String.valueOf(model.getPrice()));
-        }
-        mainDialog.setCancelable(false)
-                .setPositiveButton("Ok", null)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog dialog = mainDialog.create();
-        dialog.show();
-        Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!Utility.isBlankField(etAddPersonName) && !Utility.isBlankField(etAddPersonAge)) {
-                    DataDetailsModel dataDetailsModel = new DataDetailsModel();
-                    dataDetailsModel.setName(etAddPersonName.getText().toString());
-                    dataDetailsModel.setPrice(Integer.parseInt(etAddPersonAge.getText().toString()));
-                    //dataDetailsModel.setDate(new Date());
-                    dataDetailsModel.setMoney_set(model.getMoney_set());
-                    if (model == null)
-                        Log.d("ee","nono");
-                        // addDataToRealm(dataDetailsModel);
-                    else
-                        updatePersonDetails(dataDetailsModel, position, model.getId());
-                    dialog.cancel();
-                } else {
-                    subDialog.show();
-                }
-            }
-        });
-    }
-
-   */
 
 
     /* db삭제 */
