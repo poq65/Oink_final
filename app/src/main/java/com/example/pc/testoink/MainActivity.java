@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     static String intent_setDate;
 
 
+
     /* 뷰 */
     private TextView mTxtPercent; // 달성률 __ click 금액 다이얼로그
     private TextView mRestPercent; //회전 후 나오는거
@@ -93,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
     String remainMoney; // 남은돈
     String SetDate; // 선택 날짜 설정
+    String currnet_Date;//원래 오늘 날짜
+
+    int setmoney;
 
     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-M-d", Locale.KOREA);
 
@@ -122,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d("day", SetDate);
         }
 
+        currnet_Date = transFormat.format(dd); //현재날짜
+
+
         mIncExpList = (ListView) findViewById(R.id.list_use);
         myRealm = Realm.getInstance(MainActivity.this);
         instance = this;
@@ -142,45 +149,9 @@ public class MainActivity extends AppCompatActivity {
         mIncExpList.setAdapter(dataAdapter);
 
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
-        int setmoney = 0;
-        /* db의 데이터  가져오기 */
-        try {
-            Date d = new SimpleDateFormat("yyyy-M-d").parse(SetDate);
+        setmoney = 0;
+        getDailyMoney();
 
-            RealmResults<DailyMoneyModel> results = myRealm.where(DailyMoneyModel.class)
-                    .lessThanOrEqualTo("startDate", d)
-                    .greaterThanOrEqualTo("endDate", d)
-                    .findAll();
-            //        Log.e("ee", results.get(results.size()-1).getEndDate());
-            myRealm.beginTransaction();
-
-            if (results.size() > 0) {
-                setmoney=results.get(0).getMoney_set();
-                String string = Integer.toString(setmoney - money_sum);
-                Log.e("money", "일일설정액 - 선택한 날짜 " + string);
-                 /* 일일 설정액 초과시 알림*/
-                if(Integer.valueOf(string)<0) {
-                    NotificationSomethings();
-                }
-
-                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
-                mTxtPercent.setText(remainMoney+"%");
-            }
-            myRealm.commitTransaction();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-
-
-//        // 달성률 클릭시
-//        mTxtPercent.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 일일설정액 - 사용금액 = 남은금엑
-//
-//            }
-//        });
 
         //버튼 클릭 시 회전
         frontView.setOnClickListener(new View.OnClickListener() {
@@ -251,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     private void getDailyMoney(){
 
         try {
-            Date d = new SimpleDateFormat("yyyy-M-d").parse(SetDate);
+            Date d = new SimpleDateFormat("yyyy-M-d").parse( SetDate);
             Log.e("ee", d.toString()+"날짜 date변");
 
             RealmResults<DailyMoneyModel> results = myRealm.where(DailyMoneyModel.class)
@@ -264,9 +235,16 @@ public class MainActivity extends AppCompatActivity {
 
 
             if (results.size()>0) {
-                String string = Integer.toString(results.get(0).getMoney_set()-money_sum);
-
+                setmoney=results.get(0).getMoney_set();
+                String string = Integer.toString(setmoney - money_sum);
                 Log.e("money", "일일설정액 - 선택한 날짜 " + string);
+                // /* 일일 설정액 초과시 알림
+                if(Integer.valueOf(string)<0) {
+                    NotificationSomethings();
+                }
+
+                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
+                mTxtPercent.setText(remainMoney+"%");
             }
 
             myRealm.commitTransaction();
@@ -295,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
     private void getAllUsers() {
         Log.e(LOG_TAG, "DataList.getAllUsers");
         dataDetailsModelArrayList.clear();
-        RealmResults<DataDetailsModel> results = myRealm.where(DataDetailsModel.class).equalTo("date", SetDate).findAll();
+        RealmResults<DataDetailsModel> results = myRealm.where(DataDetailsModel.class).equalTo("date",  SetDate).findAll();
         myRealm.beginTransaction();
         for (int i = 0; i < results.size(); i++) {
             dataDetailsModelArrayList.add(results.get(i));
@@ -404,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText etAddCategory = (EditText) promptsView.findViewById(R.id.setCategory);
         final EditText etAddIncome = (EditText) promptsView.findViewById(R.id.setIncome);
         TextView tv_datee = (TextView) promptsView.findViewById(R.id.tv_datee);
-        tv_datee.setText(SetDate);
+        tv_datee.setText(currnet_Date);
 
         final RadioGroup rg = (RadioGroup) promptsView.findViewById(R.id.dialog_rg);
         int checkedId = rg.getCheckedRadioButtonId();
@@ -459,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
                         DataDetailsModel dataDetailsModel = new DataDetailsModel();
                         dataDetailsModel.setName(etAddCategory.getText().toString());
                         dataDetailsModel.setPrice(Integer.parseInt(etAddIncome.getText().toString()));
-                        dataDetailsModel.setDate(transFormat.format(new Date())); //date추가
+                        dataDetailsModel.setDate(currnet_Date); //date추가
                         dataDetailsModel.setInOrOut(false);
 
                         Log.d("ee", dataDetailsModel.getDate().toString());
@@ -474,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
                         DataDetailsModel dataDetailsModel = new DataDetailsModel();
                         dataDetailsModel.setName(etAddCategory.getText().toString());
                         dataDetailsModel.setPrice(Integer.parseInt(etAddIncome.getText().toString()));
-                        dataDetailsModel.setDate(transFormat.format(new Date())); //date추가
+                        dataDetailsModel.setDate(currnet_Date); //date추가
                         dataDetailsModel.setInOrOut(true); //지출
 
 
