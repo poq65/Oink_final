@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -53,12 +54,24 @@ public class CalenderDialog extends AppCompatActivity {
 
 
 
-
-
-
-
     }
 
+    //backey 설정
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
 
+
+        if(event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+
+            // 전화면
+            Intent intent = new Intent(getApplicationContext(),//현재화면의
+                    MainActivity.class);//다음 넘어갈 클래스 지정
+
+            startActivity(intent);//다음 화면으로 넘어간다
+            finish();
+        }
+        return true;
+
+    }
 
 }
