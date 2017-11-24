@@ -51,19 +51,19 @@ public class MainActivity extends AppCompatActivity {
     final static String LOG_TAG = "myLogs";
 
     //그 전 화면의 intent에서 date정보를 가져오는 함수
-    static String intent_setDate;
+    static String intent_setDate=null;
 
 
 
     /* 뷰 */
-    private TextView mTxtPercent; // 달성률 __ click 금액 다이얼로그
-    private TextView mRestPercent; //회전 후 나오는거
-    private TextView mTxtCalcDate; // 오늘날짜 __ click 달력 다이얼로그
+    private TextView mTxtPercent = null; // 달성률 __ click 금액 다이얼로그
+    private TextView mRestPercent = null; //회전 후 나오는거
+    private TextView mTxtCalcDate = null; // 오늘날짜 __ click 달력 다이얼로그
     private ImageView mImgScrEvent; // 스크롤 이벤트 버튼
     private FloatingActionButton mBtnAddUpdate; // 플로팅 __ click 수입,지출 기록 다이얼로그
     private FloatingActionButton mBtnMoneySet; // 플로팅 __ click 일일 지출액 설정
-    private TextView dailyset;
-    private TextView remMoney;
+    private TextView dailyset =  null;
+    private TextView remMoney = null;
 
     /*  private CustomCalendarDialog mCalendarDialog= new CustomCalendarDialog(this);
 */
@@ -145,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
         dailyset=(TextView)findViewById(R.id.txt_dailySet);
         remMoney=(TextView)findViewById(R.id.txt_remain);
 
-        dataAdapter=new DataDetailsAdapter(this,dataDetailsModelArrayList);
-        mIncExpList.setAdapter(dataAdapter);
+        //dataAdapter=new DataDetailsAdapter(this,dataDetailsModelArrayList);
+        //mIncExpList.setAdapter(dataAdapter);
 
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
         setmoney = 0;
@@ -208,6 +208,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //새로추가를 눌렀을 때 null을 줌
                 addOrUpdatePersonDetailsDialog(null, -1);
+                dataDetailsAdapter.notifyDataSetChanged();
+
             }
         });
 
@@ -256,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
 ///--------------------db관련 함수들-----------------------
 
     public static MainActivity getInstance() {
@@ -283,6 +287,12 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         dataDetailsAdapter.notifyDataSetChanged();
 
+        setMoney_sum();
+
+    }
+
+    public void setMoney_sum(){
+
         // 남은 금액 계산
         money_sum = 0;
         for (int j = 0; j < dataDetailsModelArrayList.size(); j++) {
@@ -295,6 +305,14 @@ public class MainActivity extends AppCompatActivity {
         }
         String string = Integer.toString(money_sum);
         Log.e("money", string);
+
+        if(mRestPercent != null)
+            mRestPercent.setText(money_sum + "원");
+        if(dailyset != null)
+            dailyset.setText(Integer.toString(setmoney));
+        if(remMoney != null)
+            remMoney.setText(Integer.toString(setmoney-money_sum));
+
     }
 
     public void deleteData(int personId, int position) {
@@ -336,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         id++;
         dataDetailsAdapter.notifyDataSetChanged();
+        setMoney_sum();
 
     } // end addDataToRealm
 
@@ -351,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         dataDetailsModelArrayList.set(position, editPersonDetails);
         dataDetailsAdapter.notifyDataSetChanged();
+        setMoney_sum();
     } // end updatePersonDetails
 
 
@@ -456,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
                         dataDetailsModel.setInOrOut(true); //지출
 
 
-                        dataDetailsAdapter.notifyDataSetChanged();
+
 
                         Log.d("eeeeeeeeeeeeeeeeeeee", dataDetailsModel.getDate().toString());
 
@@ -469,6 +489,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {//다이얼 로그가 비워져 있다면 이것을 보여줘!!
                     subDialog.show();
                 }
+
+                dataDetailsAdapter.notifyDataSetChanged();
             }
         });
 
@@ -573,6 +595,9 @@ public class MainActivity extends AppCompatActivity {
                     mContainer.startAnimation(rot);
                 }
             });
+
+
+            dataDetailsAdapter.notifyDataSetChanged();
         }
 
         @Override
