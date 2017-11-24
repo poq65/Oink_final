@@ -161,14 +161,15 @@ public class MainActivity extends AppCompatActivity {
                 mRestPercent.setText(money_sum + "원");
             }
         });
+
         backView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 applyRotation(180f, 270f, 360f, 0f);
+                mTxtPercent.setText(remainMoney+"%");
 
             }
         });
-
 
 
 
@@ -234,10 +235,8 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e("ee", results.get(results.size()-1).getEndDate());
             myRealm.beginTransaction();
 
-
-
             if (results.size()>0) {
-                setmoney=results.get(0).getMoney_set();
+                setmoney = results.get(0).getMoney_set();
                 String string = Integer.toString(setmoney - money_sum);
                 Log.e("money", "일일설정액 - 선택한 날짜 " + string);
                 // /* 일일 설정액 초과시 알림
@@ -245,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
                     NotificationSomethings();
                 }
 
-                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
-                mTxtPercent.setText(remainMoney+"%");
+                remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+               // mTxtPercent.setText(remainMoney+"%");
             }
 
             myRealm.commitTransaction();
@@ -289,12 +288,15 @@ public class MainActivity extends AppCompatActivity {
 
         setMoney_sum();
 
+        // 추가
+
     }
 
     public void setMoney_sum(){
 
         // 남은 금액 계산
         money_sum = 0;
+
         for (int j = 0; j < dataDetailsModelArrayList.size(); j++) {
             if(dataDetailsModelArrayList.get(j).isInOrOut()) {
                 money_sum += dataDetailsModelArrayList.get(j).getPrice();
@@ -303,15 +305,24 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
+
         String string = Integer.toString(money_sum);
         Log.e("money", string);
 
         if(mRestPercent != null)
             mRestPercent.setText(money_sum + "원");
+
         if(dailyset != null)
             dailyset.setText(Integer.toString(setmoney));
+
         if(remMoney != null)
             remMoney.setText(Integer.toString(setmoney-money_sum));
+
+      //  remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+
+     //   if(mTxtPercent!=null)
+       //     mTxtPercent.setText(remainMoney+ "%");
 
     }
 
