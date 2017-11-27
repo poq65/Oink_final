@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     float setmoney=0;
 
+
     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-M-d", Locale.KOREA);
 
     @Override
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        int a= (int)setmoney;
+        int a = (int)setmoney;
         int b = (int)money_sum;
         /* */
         dailyset.setText(Integer.toString(a));
@@ -323,11 +324,13 @@ public class MainActivity extends AppCompatActivity {
         if(mRestPercent != null)
             mRestPercent.setText((int)money_sum + "원");
 
+        int c = (int)setmoney;
+        int d = (int)money_sum;
         if(dailyset != null)
-            dailyset.setText(Float.toString((int)setmoney));
+            dailyset.setText(Integer.toString(c));
 
         if(remMoney != null)
-            remMoney.setText(Float.toString((int)setmoney-(int)money_sum));
+            remMoney.setText(Integer.toString(c-d));
 
         //getDailyMoney();
 
