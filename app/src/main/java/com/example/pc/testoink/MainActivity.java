@@ -334,10 +334,10 @@ public class MainActivity extends AppCompatActivity {
 
         //getDailyMoney();
 
-       //remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+        remainMoney = Float.toString(Math.round((setmoney-money_sum)/setmoney*100.0f));
 
-       //if(mTxtPercent!=null)
-         //  mTxtPercent.setText(remainMoney+ "%");
+       if(mTxtPercent!=null)
+           mTxtPercent.setText(remainMoney+ "%");
 
     }
 
