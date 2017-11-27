@@ -51,19 +51,19 @@ public class MainActivity extends AppCompatActivity {
     final static String LOG_TAG = "myLogs";
 
     //그 전 화면의 intent에서 date정보를 가져오는 함수
-    static String intent_setDate;
+    static String intent_setDate=null;
 
 
 
     /* 뷰 */
-    private TextView mTxtPercent; // 달성률 __ click 금액 다이얼로그
-    private TextView mRestPercent; //회전 후 나오는거
-    private TextView mTxtCalcDate; // 오늘날짜 __ click 달력 다이얼로그
+    private TextView mTxtPercent = null; // 달성률 __ click 금액 다이얼로그
+    private TextView mRestPercent = null; //회전 후 나오는거
+    private TextView mTxtCalcDate = null; // 오늘날짜 __ click 달력 다이얼로그
     private ImageView mImgScrEvent; // 스크롤 이벤트 버튼
     private FloatingActionButton mBtnAddUpdate; // 플로팅 __ click 수입,지출 기록 다이얼로그
     private FloatingActionButton mBtnMoneySet; // 플로팅 __ click 일일 지출액 설정
-    private TextView dailyset;
-    private TextView remMoney;
+    private TextView dailyset =  null;
+    private TextView remMoney = null;
 
     /*  private CustomCalendarDialog mCalendarDialog= new CustomCalendarDialog(this);
 */
@@ -89,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
     private ListView mIncExpList;
     private static ArrayList<DataDetailsModel> dataDetailsModelArrayList = new ArrayList<>();
     private DataDetailsAdapter dataDetailsAdapter;
-    private int money_sum=0; //추가
+    private float money_sum=0; //추가
     private static MainActivity instance;
 
-    String remainMoney; // 남은돈
+    String remainMoney="0"; // 남은돈
     String SetDate; // 선택 날짜 설정
     String currnet_Date;//원래 오늘 날짜
 
-    int setmoney;
+    float setmoney=0;
 
     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-M-d", Locale.KOREA);
 
@@ -145,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
         dailyset=(TextView)findViewById(R.id.txt_dailySet);
         remMoney=(TextView)findViewById(R.id.txt_remain);
 
-        dataAdapter=new DataDetailsAdapter(this,dataDetailsModelArrayList);
-        mIncExpList.setAdapter(dataAdapter);
+        //dataAdapter=new DataDetailsAdapter(this,dataDetailsModelArrayList);
+        //mIncExpList.setAdapter(dataAdapter);
 
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
         setmoney = 0;
@@ -158,17 +158,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 applyRotation(0f, 90f, 180f, 0f);
-                mRestPercent.setText(money_sum + "원");
+                mRestPercent.setText((int)money_sum + "원");
             }
         });
+
         backView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 applyRotation(180f, 270f, 360f, 0f);
+                mTxtPercent.setText(remainMoney+"%");
+                Log.e("remainMoney", remainMoney);
 
             }
         });
-
 
 
 
@@ -208,12 +210,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //새로추가를 눌렀을 때 null을 줌
                 addOrUpdatePersonDetailsDialog(null, -1);
+                dataDetailsAdapter.notifyDataSetChanged();
+
             }
         });
 
+        int a= (int)setmoney;
+        int b = (int)money_sum;
         /* */
-        dailyset.setText(Integer.toString(setmoney));
-        remMoney.setText(Integer.toString(setmoney-money_sum));
+        dailyset.setText(Integer.toString(a));
+        remMoney.setText(Integer.toString(a-b));
 
     } // end onCreate
 
@@ -232,19 +238,24 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e("ee", results.get(results.size()-1).getEndDate());
             myRealm.beginTransaction();
 
-
-
             if (results.size()>0) {
-                setmoney=results.get(0).getMoney_set();
-                String string = Integer.toString(setmoney - money_sum);
+                setmoney = results.get(0).getMoney_set();
+                String string = Float.toString((setmoney - money_sum));
+
                 Log.e("money", "일일설정액 - 선택한 날짜 " + string);
                 // /* 일일 설정액 초과시 알림
-                if(Integer.valueOf(string)<0) {
+                if(Float.valueOf(string)<0) {
                     NotificationSomethings();
                 }
 
-                remainMoney=Integer.toString((setmoney-money_sum)/results.get(0).getMoney_set()*100);
-                mTxtPercent.setText(remainMoney+"%");
+                remainMoney = Float.toString(Math.round((setmoney-money_sum)/setmoney*100.0f));
+
+                String string1 = remainMoney;
+
+                Log.e("money", "remainmoney " + string1);
+
+               if(mTxtPercent!=null)
+                   mTxtPercent.setText(remainMoney+"%");
             }
 
             myRealm.commitTransaction();
@@ -254,6 +265,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
 
 ///--------------------db관련 함수들-----------------------
@@ -283,8 +296,17 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         dataDetailsAdapter.notifyDataSetChanged();
 
+        setMoney_sum();
+
+        // 추가
+
+    }
+
+    public void setMoney_sum(){
+
         // 남은 금액 계산
         money_sum = 0;
+
         for (int j = 0; j < dataDetailsModelArrayList.size(); j++) {
             if(dataDetailsModelArrayList.get(j).isInOrOut()) {
                 money_sum += dataDetailsModelArrayList.get(j).getPrice();
@@ -293,8 +315,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        String string = Integer.toString(money_sum);
+
+
+        String string = Float.toString(money_sum);
         Log.e("money", string);
+
+        if(mRestPercent != null)
+            mRestPercent.setText((int)money_sum + "원");
+
+        if(dailyset != null)
+            dailyset.setText(Float.toString((int)setmoney));
+
+        if(remMoney != null)
+            remMoney.setText(Float.toString((int)setmoney-(int)money_sum));
+
+        //getDailyMoney();
+
+       //remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+
+       //if(mTxtPercent!=null)
+         //  mTxtPercent.setText(remainMoney+ "%");
+
     }
 
     public void deleteData(int personId, int position) {
@@ -336,6 +377,7 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         id++;
         dataDetailsAdapter.notifyDataSetChanged();
+        setMoney_sum();
 
     } // end addDataToRealm
 
@@ -351,6 +393,7 @@ public class MainActivity extends AppCompatActivity {
         myRealm.commitTransaction();
         dataDetailsModelArrayList.set(position, editPersonDetails);
         dataDetailsAdapter.notifyDataSetChanged();
+        setMoney_sum();
     } // end updatePersonDetails
 
 
@@ -456,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
                         dataDetailsModel.setInOrOut(true); //지출
 
 
-                        dataDetailsAdapter.notifyDataSetChanged();
+
 
                         Log.d("eeeeeeeeeeeeeeeeeeee", dataDetailsModel.getDate().toString());
 
@@ -469,6 +512,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {//다이얼 로그가 비워져 있다면 이것을 보여줘!!
                     subDialog.show();
                 }
+
+                dataDetailsAdapter.notifyDataSetChanged();
             }
         });
 
@@ -573,6 +618,9 @@ public class MainActivity extends AppCompatActivity {
                     mContainer.startAnimation(rot);
                 }
             });
+
+
+            dataDetailsAdapter.notifyDataSetChanged();
         }
 
         @Override
