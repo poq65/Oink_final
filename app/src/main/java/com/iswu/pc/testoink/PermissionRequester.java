@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import android.app.Activity;
 import android.app.AlertDialog;

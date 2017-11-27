@@ -1,8 +1,10 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.iswu.pc.testoink.R;
 
 public class Splash extends AppCompatActivity {
 

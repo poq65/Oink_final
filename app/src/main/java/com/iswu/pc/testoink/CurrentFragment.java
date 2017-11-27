@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import com.iswu.pc.testoink.R;
 
 /**
  * Created by Leeyerin on 2017. 10. 28..

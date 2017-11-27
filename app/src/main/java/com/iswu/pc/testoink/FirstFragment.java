@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import com.iswu.pc.testoink.R;
 
 /**
  * Created by samsung on 2017-10-06.
@@ -25,9 +27,15 @@ public class FirstFragment extends Fragment {
         GridView calender = (GridView)view.findViewById(R.id.grid_date);
         //MonthAdapter monthAdapter=new MonthAdapter(getActivity());
 
-        calender.setAdapter(CalenderDialog.monthAdapter);
+
+
         CalenderDialog.monthAdapter.setPriviousMonth();
         CalenderDialog.monthAdapter.notifyDataSetChanged();
+
+
+
+        calender.setAdapter(CalenderDialog.monthAdapter);
+
 
         TextView year=(TextView) view.findViewById(R.id.txt_year);
         TextView month=(TextView) view.findViewById(R.id.txt_month);

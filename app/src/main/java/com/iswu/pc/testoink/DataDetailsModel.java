@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

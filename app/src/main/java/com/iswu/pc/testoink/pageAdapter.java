@@ -1,6 +1,5 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,6 +14,7 @@ public class pageAdapter extends FragmentStatePagerAdapter {
     private int beforePosition;
     private int flag; // 처음 호출했는지 확인
     private int casePosition; // beforePosition과 position이 같아졌을 때 확인
+
 
     public pageAdapter(FragmentManager fm) {
 
@@ -49,15 +49,20 @@ public class pageAdapter extends FragmentStatePagerAdapter {
 
         if(flag == 0){ // 처음 page를 호출했다면
             flag = 1;
+            Log.d("current","dd");
             return new CurrentFragment();
         }
 
 
         switch (casePosition){
             case 0:
+                Log.d("current","ee");
                 return new FirstFragment();
+
             case 1:
+                Log.d("current","aa");
                 return new SecondFragment();
+
             //case 3:
             //    return new CurrentFragment();
 

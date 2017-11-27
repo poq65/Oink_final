@@ -1,19 +1,16 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.iswu.pc.testoink.R;
 
 public class CalenderDialog extends AppCompatActivity {
 
@@ -22,6 +19,7 @@ public class CalenderDialog extends AppCompatActivity {
     private TextView month, year;
     private ImageView pig;
     private ViewPager vp;
+
 
     static private Context context;
 

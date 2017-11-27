@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 
 import android.app.DatePickerDialog;
@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+
+import com.iswu.pc.testoink.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
