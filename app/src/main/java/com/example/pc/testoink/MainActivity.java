@@ -89,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
     private ListView mIncExpList;
     private static ArrayList<DataDetailsModel> dataDetailsModelArrayList = new ArrayList<>();
     private DataDetailsAdapter dataDetailsAdapter;
-    private int money_sum=0; //추가
+    private float money_sum=0; //추가
     private static MainActivity instance;
 
-    String remainMoney; // 남은돈
+    String remainMoney="0"; // 남은돈
     String SetDate; // 선택 날짜 설정
     String currnet_Date;//원래 오늘 날짜
 
-    int setmoney;
+    float setmoney=0;
 
     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-M-d", Locale.KOREA);
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 applyRotation(0f, 90f, 180f, 0f);
-                mRestPercent.setText(money_sum + "원");
+                mRestPercent.setText((int)money_sum + "원");
             }
         });
 
@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 applyRotation(180f, 270f, 360f, 0f);
                 mTxtPercent.setText(remainMoney+"%");
+                Log.e("remainMoney", remainMoney);
 
             }
         });
@@ -214,9 +215,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        int a= (int)setmoney;
+        int b = (int)money_sum;
         /* */
-        dailyset.setText(Integer.toString(setmoney));
-        remMoney.setText(Integer.toString(setmoney-money_sum));
+        dailyset.setText(Integer.toString(a));
+        remMoney.setText(Integer.toString(a-b));
 
     } // end onCreate
 
@@ -237,15 +240,22 @@ public class MainActivity extends AppCompatActivity {
 
             if (results.size()>0) {
                 setmoney = results.get(0).getMoney_set();
-                String string = Integer.toString(setmoney - money_sum);
+                String string = Float.toString((setmoney - money_sum));
+
                 Log.e("money", "일일설정액 - 선택한 날짜 " + string);
                 // /* 일일 설정액 초과시 알림
-                if(Integer.valueOf(string)<0) {
+                if(Float.valueOf(string)<0) {
                     NotificationSomethings();
                 }
 
-                remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
-               // mTxtPercent.setText(remainMoney+"%");
+                remainMoney = Float.toString(Math.round((setmoney-money_sum)/setmoney*100.0f));
+
+                String string1 = remainMoney;
+
+                Log.e("money", "remainmoney " + string1);
+
+               if(mTxtPercent!=null)
+                   mTxtPercent.setText(remainMoney+"%");
             }
 
             myRealm.commitTransaction();
@@ -307,22 +317,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        String string = Integer.toString(money_sum);
+        String string = Float.toString(money_sum);
         Log.e("money", string);
 
         if(mRestPercent != null)
-            mRestPercent.setText(money_sum + "원");
+            mRestPercent.setText((int)money_sum + "원");
 
         if(dailyset != null)
-            dailyset.setText(Integer.toString(setmoney));
+            dailyset.setText(Float.toString((int)setmoney));
 
         if(remMoney != null)
-            remMoney.setText(Integer.toString(setmoney-money_sum));
+            remMoney.setText(Float.toString((int)setmoney-(int)money_sum));
 
-      //  remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+        //getDailyMoney();
 
-     //   if(mTxtPercent!=null)
-       //     mTxtPercent.setText(remainMoney+ "%");
+       //remainMoney=Integer.toString((setmoney-money_sum)/setmoney*100);
+
+       //if(mTxtPercent!=null)
+         //  mTxtPercent.setText(remainMoney+ "%");
 
     }
 
