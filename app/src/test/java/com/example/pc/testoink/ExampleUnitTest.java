@@ -1,4 +1,4 @@
-package com.example.pc.testoink;
+package com.iswu.pc.testoink;
 
 import org.junit.Test;
 
